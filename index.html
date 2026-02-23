@@ -1,0 +1,75 @@
+!DOCTYPE html>
+<html>
+<head>
+  <title>Number Guess Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: white;
+      margin: 0;
+      padding: 40px;
+    }
+
+    .game-box {
+      background: white;
+      color: black;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    input {
+      padding: 8px;
+      width: 80%;
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #0072ff;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0059c9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-box">
+    <h1>🎯 Guess the Number</h1>
+    <p>I am thinking of a number between 1 and 10</p>
+
+    <input type="number" id="guess" placeholder="Enter your guess">
+    <br>
+    <button onclick="checkGuess()">Check</button>
+
+    <p id="result"></p>
+  </div>
+
+  <script>
+    let secretNumber = Math.floor(Math.random() * 10) + 1;
+
+    function checkGuess() {
+      let userGuess = document.getElementById("guess").value;
+      let result = document.getElementById("result");
+
+      if (userGuess == secretNumber) {
+        result.textContent = "🎉 Correct! You guessed it!";
+      } else {
+        result.textContent = "❌ Wrong! Try again.";
+      }
+    }
+  </script>
+
+</body>
+</html>
