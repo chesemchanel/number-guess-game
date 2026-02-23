@@ -1,73 +1,187 @@
-!DOCTYPE html>
+
+<!DOCTYPE html>
 <html>
 <head>
-  <title>Number Guess Game</title>
+  <title>Ultimate Cartoon Guess Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
       margin: 0;
       padding: 40px;
+      transition: 0.5s;
     }
 
     .game-box {
       background: white;
       color: black;
       padding: 30px;
-      border-radius: 15px;
+      border-radius: 20px;
       max-width: 400px;
       margin: auto;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .cartoon {
+      font-size: 60px;
+      animation: bounce 2s infinite;
+      margin-bottom: 10px;
     }
 
     input {
-      padding: 8px;
+      padding: 10px;
       width: 80%;
       margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
     button {
       padding: 10px 20px;
       border: none;
-      background: #0072ff;
+      background: #ff6b6b;
       color: white;
       border-radius: 8px;
       cursor: pointer;
+      margin: 5px;
+      transition: 0.3s;
     }
 
     button:hover {
-      background: #0059c9;
+      background: #ff4757;
+      transform: scale(1.1);
+    }
+
+    .stats {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #555;
     }
   </style>
 </head>
+
 <body>
 
   <div class="game-box">
-    <h1>🎯 Guess the Number</h1>
-    <p>I am thinking of a number between 1 and 10</p>
+    <div id="cartoon" class="cartoon">🤔</div>
 
-    <input type="number" id="guess" placeholder="Enter your guess">
+    <h1>🎯 Guess the Number</h1>
+    <p id="levelText">Level 1: Guess between 1 and 10</p>
+
+    <input type="number" id="guess" placeholder="Enter number">
     <br>
     <button onclick="checkGuess()">Check</button>
+    <button onclick="resetGame()">Reset</button>
 
     <p id="result"></p>
+
+    <div class="stats">
+      <p>Attempts Left: <span id="attempts">5</span></p>
+      <p>Score: <span id="score">0</span></p>
+      <p>Level: <span id="level">1</span></p>
+    </div>
   </div>
 
+  <!-- Sound Effects -->
+  <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio>
+  <audio id="loseSound" src="https://assets.mixkit.co/sfx/preview/mixkit-retro-arcade-lose-2027.mp3"></audio>
+  <audio id="wrongSound" src="https://assets.mixkit.co/sfx/preview/mixkit-game-show-wrong-answer-buzz-950.mp3"></audio>
+
   <script>
-    let secretNumber = Math.floor(Math.random() * 10) + 1;
+    let level = 1;
+    let maxNumber = 10;
+    let secretNumber = Math.floor(Math.random() * maxNumber) + 1;
+    let attemptsLeft = 5;
+    let score = 0;
 
     function checkGuess() {
-      let userGuess = document.getElementById("guess").value;
+      let userGuess = Number(document.getElementById("guess").value);
       let result = document.getElementById("result");
+      let cartoon = document.getElementById("cartoon");
 
-      if (userGuess == secretNumber) {
-        result.textContent = "🎉 Correct! You guessed it!";
+      if (attemptsLeft <= 0) return;
+
+      attemptsLeft--;
+      document.getElementById("attempts").textContent = attemptsLeft;
+
+      if (userGuess === secretNumber) {
+        score += 10;
+        level++;
+        maxNumber += 5;
+
+        document.getElementById("score").textContent = score;
+        document.getElementById("level").textContent = level;
+        document.getElementById("levelText").textContent =
+          "Level " + level + ": Guess between 1 and " + maxNumber;
+
+        document.getElementById("winSound").play();
+
+        result.textContent = "🎉 Correct! Level Up!";
+        result.style.color = "green";
+        cartoon.textContent = "😄";
+        document.body.style.background =
+          "linear-gradient(135deg, #00c9ff, #92fe9d)";
+
+        resetRound();
       } else {
-        result.textContent = "❌ Wrong! Try again.";
+        document.getElementById("wrongSound").play();
+        result.style.color = "red";
+        cartoon.textContent = "😬";
+
+        if (userGuess > secretNumber) {
+          result.textContent = "📉 Too High!";
+        } else {
+          result.textContent = "📈 Too Low!";
+        }
       }
+
+      if (attemptsLeft === 0 && userGuess !== secretNumber) {
+        document.getElementById("loseSound").play();
+        result.textContent =
+          "💀 Game Over! The number was " + secretNumber;
+        cartoon.textContent = "😵";
+      }
+    }
+
+    function resetRound() {
+      attemptsLeft = 5;
+      document.getElementById("attempts").textContent = attemptsLeft;
+      secretNumber = Math.floor(Math.random() * maxNumber) + 1;
+      document.getElementById("guess").value = "";
+    }
+
+    function resetGame() {
+      level = 1;
+      maxNumber = 10;
+      score = 0;
+      attemptsLeft = 5;
+
+      document.getElementById("level").textContent = level;
+      document.getElementById("score").textContent = score;
+      document.getElementById("attempts").textContent = attemptsLeft;
+      document.getElementById("levelText").textContent =
+        "Level 1: Guess between 1 and 10";
+      document.getElementById("result").textContent = "";
+      document.getElementById("cartoon").textContent = "🤔";
+      document.body.style.background =
+        "linear-gradient(135deg, #667eea, #764ba2)";
+
+      secretNumber = Math.floor(Math.random() * maxNumber) + 1;
     }
   </script>
 
